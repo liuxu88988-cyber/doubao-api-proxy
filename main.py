@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import requests
 import os
@@ -25,8 +25,18 @@ def home():
 
 
 @app.post("/v1/chat/completions")
-def chat(request: ChatRequest):
+def chat(
+    request: ChatRequest,
+    authorization: str = Header(None)
+):
+    USER_API_KEY = "my_first_user_key"
 
+    if authorization != f"Bearer {USER_API_KEY}":
+        raise HTTPException(
+        status_code=401,
+        detail="Invalid API Key"
+        )
+    
     url = "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
 
     headers = {
